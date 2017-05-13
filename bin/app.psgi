@@ -11,6 +11,8 @@ use Pubtmp;
 
 Pubtmp->to_app;
 
+=begin comment
+
 use Plack::Builder;
 
 builder {
@@ -18,9 +20,6 @@ builder {
     Pubtmp->to_app;
 }
 
-
-
-=begin comment
 # use this block if you want to include middleware such as Plack::Middleware::Deflater
 
 use Pubtmp;
