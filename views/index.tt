@@ -62,13 +62,17 @@
             <time datetime="<% uploaded_at %>"><% uploaded_at %></time>
           </td>
           <td>
-            <a href="<% link_to_download %>">Download</a>
-            <a href="<% link_to_delete %>">Delete</a>
+            <a href="<% link_to_preview %>">View</a>
           </td>
         </tr>
         <% END %>
       </tbody>
       </table>
+      <hr>
+      <p>
+        Disk space used: <% pubtmp_folder_size_used_human %><br>
+        Disk space free: <% pubtmp_folder_size_free_human %><br>
+      </p>
     </div>
 
   </div>

@@ -6,11 +6,13 @@ use Digest;
 use Digest::Whirlpool;
 use Digest::SHA qw(sha512_base64);
 use Data::UUID;
+use List::Util qw(sum);
 use Time::Moment;
 use File::Next;
 
 our $VERSION = '0.1';
 
+use constant PUBTMP_QUOTA => "2147483648"; # 2GB
 use constant PUBTMP_ROOT => "/tmp/pubtmp";
 
 sub whirlpool_base64 {
@@ -51,24 +53,29 @@ sub humanized_file_size {
     return sprintf("%.1fGB", $n/1073741824);
 }
 
+sub humanize_file {
+    my ($file_meta_data) = @_;
+    return +{
+        uuid        => $file_meta_data->{uuid},
+        basename    => $file_meta_data->{upload}{basename},
+        uploaded_at => $file_meta_data->{uploaded_at},
+
+        size       => $file_meta_data->{upload}{size},
+        size_human => humanized_file_size($file_meta_data->{upload}{size}),
+
+        link_to_preview  => uri_for("/preview", { basename => $file_meta_data->{upload}{basename}, n => $file_meta_data->{uuid} }),
+    };
+}
+
 sub gather_files_in_pubtmp {
     my @files;
     my $meta_files = File::Next::files(PUBTMP_ROOT . "/meta");
     while ( defined( my $file = $meta_files->() ) ) {
         next unless $file =~ /\.json\z/;
-        my $meta_data = load_file_json($file);
+        my $file_meta_data = load_file_json($file);
 
-        if (-f $meta_data->{storage}{path}) {
-            push @files, {
-                basename => $meta_data->{upload}{basename},
-                uploaded_at => $meta_data->{uploaded_at},
-
-                size       => $meta_data->{upload}{size},
-                size_human => humanized_file_size($meta_data->{upload}{size}),
-
-                link_to_download => "/file/" . $meta_data->{upload}{basename} . "?n=" . $meta_data->{uuid},
-                link_to_delete   => "/file/" . $meta_data->{upload}{basename} . "?n=" . $meta_data->{uuid} . "&_method=delete",
-            };
+        if (-f $file_meta_data->{storage}{path}) {
+            push @files, humanize_file($file_meta_data);
         } else {
             debug "Missing in storage: $file";
         }
@@ -86,27 +93,68 @@ sub file_lookup_by_uuid {
     my $meta_files = File::Next::files(PUBTMP_ROOT . "/meta");
     while ( !$found && defined( my $file = $meta_files->() ) ) {
         next unless $file =~ /\.json\z/;
-        my $meta_data = load_file_json($file);
+        my $file_meta_data = load_file_json($file);
 
-        next unless $meta_data->{uuid} eq $uuid && -f $meta_data->{storage}{path};
-        $found = $meta_data->{storage}{path};
+        next unless $file_meta_data->{uuid} eq $uuid && -f $file_meta_data->{storage}{path};
+        $found = $file_meta_data;
     }
     return $found;
 }
 
+sub unlink_by_uuid_if_exists {
+    my ($uuid) = @_;
+    my $fmd = file_lookup_by_uuid($uuid) or return;
+
+    unlink($fmd->{storage}{path});
+    unlink($fmd->{meta}{path});
+
+    return 1;
+}
+
 get '/' => sub {
     my $files = gather_files_in_pubtmp();
-    template 'index' => { 'title' => 'Pubtmp', pubtmp_file_list => $files };
+
+    my $folder_size_used = sum(map{ $_->{size} }@$files) // 0;
+    my $folder_size_free = PUBTMP_QUOTA - $folder_size_used;
+    template 'index' => {
+        'title' => 'Pubtmp',
+        pubtmp_folder_size_free_human => humanized_file_size($folder_size_free),
+        pubtmp_folder_size_used_human => humanized_file_size($folder_size_used),
+        pubtmp_folder_quota_human     => humanized_file_size(PUBTMP_QUOTA),
+        pubtmp_file_list => $files,
+    };
+};
+
+get '/preview' => sub {
+    my $file_meta_data = file_lookup_by_uuid( param("n") ) or do {
+        redirect "/";
+        return;
+    };
+
+    template 'preview' => {
+        file => humanize_file( $file_meta_data )
+    };
 };
 
 get '/file/:basename' => sub {
-    my $path = file_lookup_by_uuid( param("n") );
-    if ($path) {
-        debug "The file: $path";
-        send_file($path, system_path => 1);
-    } else {
+    my $file_meta_data = file_lookup_by_uuid( param("n") ) or do {
         redirect "/";
+        return;
+    };
+
+    send_file($file_meta_data->{storage}{path}, system_path => 1);
+};
+
+del '/file/:uuid' => sub {
+    unlink_by_uuid_if_exists( param("uuid") );
+    redirect "/";
+};
+
+post '/file/:uuid' => sub {
+    if (param("_method") eq "delete") {
+        unlink_by_uuid_if_exists( param("uuid") );
     }
+    redirect "/";
 };
 
 post '/' => sub {
@@ -117,7 +165,7 @@ post '/' => sub {
         my $path = PUBTMP_ROOT . "/store/$uuid";
 
         my $upload_content = $upload->content;
-        my $meta_data = {
+        my $file_meta_data = {
             uuid => $uuid,
             digest => {
                 sha512_base64 => sha512_base64( $upload_content ),
@@ -134,12 +182,15 @@ post '/' => sub {
                 type => "filesystem",
                 path => $path,
             },
+            meta => {
+                path => PUBTMP_ROOT . "/meta/$uuid.json",
+            },
             uploaded_at => Time::Moment->now->strftime("%Y-%m-%dT%H:%M:%S%f%Z"),
         };
 
         debug "The filename is $path";
 
-        write_file_json( PUBTMP_ROOT . "/meta/$uuid.json", $meta_data);
+        write_file_json($file_meta_data->{meta}{path} , $file_meta_data);
 
         $upload->copy_to($path);
     }

@@ -1,0 +1,14 @@
+<div id="page">
+
+  <div id="content">
+    View
+
+    <hr>
+
+    <form method="POST" action="/file/<% file.uuid %>">
+      <input type="hidden" name="_method" value="delete">
+      <input type="submit" name="delete" value="Delete">
+    </form>
+
+  </div>
+</div>
