@@ -9,6 +9,7 @@ use Data::UUID;
 use List::Util qw(sum);
 use Time::Moment;
 use File::Next;
+use URI::Escape qw(uri_escape uri_escape_utf8);
 
 our $VERSION = '0.1';
 
@@ -55,6 +56,7 @@ sub humanized_file_size {
 
 sub humanize_file {
     my ($file_meta_data) = @_;
+
     return +{
         uuid        => $file_meta_data->{uuid},
         basename    => $file_meta_data->{upload}{basename},
@@ -63,7 +65,13 @@ sub humanize_file {
         size       => $file_meta_data->{upload}{size},
         size_human => humanized_file_size($file_meta_data->{upload}{size}),
 
-        link_to_preview  => uri_for("/preview", { basename => $file_meta_data->{upload}{basename}, n => $file_meta_data->{uuid} }),
+        ($file_meta_data->{upload}{type} =~ /\Aimage/) ? (
+            is_previewable_as_image => 1,
+            url_for_previewable_image => uri_for("/file/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { n => $file_meta_data->{uuid} })
+        ):(),
+
+        url_for_preview  => uri_for("/preview/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { n => $file_meta_data->{uuid} }),
+        url_for_download  => uri_for("/file/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { n => $file_meta_data->{uuid}, dl => 1 }),
     };
 }
 
@@ -125,7 +133,7 @@ get '/' => sub {
     };
 };
 
-get '/preview' => sub {
+get '/preview/:basename' => sub {
     my $file_meta_data = file_lookup_by_uuid( param("n") ) or do {
         redirect "/";
         return;

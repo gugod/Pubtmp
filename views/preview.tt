@@ -1,7 +1,15 @@
 <div id="page">
 
   <div id="content">
-    View
+    <% IF file.is_previewable_as_image %>
+    <div class="file-preview-image">
+      <img src="<% file.url_for_previewable_image %>">
+    </div>
+    <% ELSE %>
+        <p>No preview for this file</p>
+    <% END %>
+
+    <a href="<% file.url_for_download %>">Download</a>
 
     <hr>
 

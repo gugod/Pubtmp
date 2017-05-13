@@ -1,54 +1,26 @@
-<div id="page">
-  <div id="sidebar">
-    <ul id="sidebar-items">
-      <li>
-        <h3>What's this</h3>
-
-        <p>
-          Pubtmp is a pbulic temporary directory for anyone to
-          place their miscellnous items.  All users have equal
-          rights to save some files here, as well as delete them.
-        </p>
-
-        <p>
-          That's right. It's all public.
-        </p>
-      </li>
-
-      <li>
-        <h3>Join the Project</h3>
-        <ul class="links">
-
-          <li><a href="https://github.com/gugod/Pubtmp/">Source code</a></li>
-          <li><a href="http://perldancer.org/">PerlDancer</a> -- the Web framework that made this site possible</li>
-        </ul>
-      </li>
-    </ul>
+<div id="content">
+  <div id="header">
+    <h1>Pubtmp</h1>
+    <h2>The folder for everone.</h2>
   </div>
 
-  <div id="content">
-    <div id="header">
-      <h1>Pubtmp</h1>
-      <h2>The folder for everone.</h2>
-    </div>
+  <div id="file-upload">
+    <form id="header-file-upload" name="header-file-upload" method="POST" action="/" enctype="multipart/form-data">
+      <input type="file" name="f">
+      <input type="submit" value="Upload">
+    </form>
+  </div>
 
-    <div id="file-upload">
-      <form id="header-file-upload" name="header-file-upload" method="POST" action="/" enctype="multipart/form-data">
-        <input type="file" name="f">
-        <input type="submit" value="Upload">
-      </form>
-    </div>
-
-    <div id="file-list">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Size</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+  <div id="file-list">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Size</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
         <% FOREACH pubtmp_file_list %>
         <tr>
@@ -62,18 +34,17 @@
             <time datetime="<% uploaded_at %>"><% uploaded_at %></time>
           </td>
           <td>
-            <a href="<% link_to_preview %>">View</a>
+            <a href="<% url_for_preview %>">View</a>
           </td>
         </tr>
         <% END %>
       </tbody>
-      </table>
-      <hr>
-      <p>
-        Disk space used: <% pubtmp_folder_size_used_human %><br>
-        Disk space free: <% pubtmp_folder_size_free_human %><br>
-      </p>
-    </div>
-
+    </table>
+    <hr>
+    <p>
+      Disk space used: <% pubtmp_folder_size_used_human %><br>
+      Disk space free: <% pubtmp_folder_size_free_human %><br>
+    </p>
   </div>
+
 </div>

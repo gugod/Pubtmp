@@ -99,3 +99,11 @@ p {
 #file-list table {
     width: 100%;
 }
+
+
+.file-preview-image img {
+    width: auto;
+}
+.file-preview-image img {
+    width: 100%;
+}
