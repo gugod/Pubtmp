@@ -59,7 +59,7 @@ sub humanize_file {
 
     return +{
         uuid        => $file_meta_data->{uuid},
-        basename    => $file_meta_data->{upload}{basename},
+        basename    => $file_meta_data->{upload}{basename} // "unnamed",
         uploaded_at => $file_meta_data->{uploaded_at},
 
         size       => $file_meta_data->{upload}{size},

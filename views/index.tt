@@ -18,23 +18,19 @@
           <th>Name</th>
           <th>Size</th>
           <th>Date</th>
-          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <% FOREACH pubtmp_file_list %>
         <tr>
           <td class="file-list-filename">
-            <% basename %>
+            <a href="<% url_for_preview %>"><% basename %></a>
           </td>
           <td>
             <% size_human %>
           </td>
           <td>
             <time datetime="<% uploaded_at %>"><% uploaded_at %></time>
-          </td>
-          <td>
-            <a href="<% url_for_preview %>">View</a>
           </td>
         </tr>
         <% END %>
