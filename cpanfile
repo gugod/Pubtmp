@@ -3,6 +3,10 @@ requires "Dancer2" => "0.205000";
 requires "Time::Moment" => 0;
 requires "Digest"       => 0;
 requires "Digest::SHA"  => 0;
+requires "Digest::Whrilpool"  => 0;
+requires "Data::UUID"  => 0;
+requires "Time::Moment"  => 0;
+requires "URI::Escape"  => 0;
 requires "File::Next"   => 0;
 
 recommends "YAML"             => "0";
