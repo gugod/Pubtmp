@@ -3,6 +3,9 @@ use autodie;
 
 use Dancer2;
 use Digest;
+use Digest::Whirlpool;
+use Digest::SHA qw(sha512_base64);
+use Data::UUID;
 use Time::Moment;
 use File::Next;
 
@@ -10,12 +13,17 @@ our $VERSION = '0.1';
 
 use constant PUBTMP_ROOT => "/tmp/pubtmp";
 
-sub generate_random_name {
-    my ($upload) = @_;
-    my ($ext) = lc($upload->basename) =~ m{\.([^\.]+)\z};
-    my $d = Digest->new("SHA-512");
-    $d->add( $upload->content );
-    return $d->hexdigest . '-' . time() . '.' . $ext;
+sub whirlpool_base64 {
+    my ($data) = @_;
+    my $d = Digest->new('Whirlpool');
+    $d->add($data);
+    return $d->base64digest;
+}
+
+sub generate_uuid {
+    my $u = Data::UUID->new;
+    my $uuid = $u->create;
+    return $u->to_hexstring($uuid);
 }
 
 sub load_file_json {
@@ -58,25 +66,29 @@ sub gather_files_in_pubtmp {
                 size       => $meta_data->{upload}{size},
                 size_human => humanized_file_size($meta_data->{upload}{size}),
 
-                link_to_download => "/dl/" . $meta_data->{name},
+                link_to_download => "/file/" . $meta_data->{upload}{basename} . "?n=" . $meta_data->{uuid},
+                link_to_delete   => "/file/" . $meta_data->{upload}{basename} . "?n=" . $meta_data->{uuid} . "&_method=delete",
             };
         } else {
             debug "Missing in storage: $file";
         }
     }
 
+    @files = sort { $b->{uploaded_at} cmp $a->{uploaded_at} } @files;
+
     return \@files;
 }
 
-sub file_lookup_by_name {
-    my ($name) = @_;
+sub file_lookup_by_uuid {
+    my ($uuid) = @_;
+
     my $found;
     my $meta_files = File::Next::files(PUBTMP_ROOT . "/meta");
     while ( !$found && defined( my $file = $meta_files->() ) ) {
         next unless $file =~ /\.json\z/;
         my $meta_data = load_file_json($file);
 
-        next unless $meta_data->{name} eq $name && -f $meta_data->{storage}{path};
+        next unless $meta_data->{uuid} eq $uuid && -f $meta_data->{storage}{path};
         $found = $meta_data->{storage}{path};
     }
     return $found;
@@ -87,10 +99,8 @@ get '/' => sub {
     template 'index' => { 'title' => 'Pubtmp', pubtmp_file_list => $files };
 };
 
-get '/dl/:name' => sub {
-    debug "Download: " . param("name");
-    my $path = file_lookup_by_name( param("name") );
-
+get '/file/:basename' => sub {
+    my $path = file_lookup_by_uuid( param("n") );
     if ($path) {
         debug "The file: $path";
         send_file($path, system_path => 1);
@@ -103,12 +113,17 @@ post '/' => sub {
     my $upload = upload("f");
     debug "The upload is $upload";
     if ($upload) {
-        my $name = generate_random_name( $upload );
-        debug "The filename is $name";
+        my $uuid = generate_uuid();
+        my $path = PUBTMP_ROOT . "/store/$uuid";
 
-        my $path = PUBTMP_ROOT . "/stash/$name";
-        write_file_json( PUBTMP_ROOT . "/meta/$name.json", {
-            name => $name,
+        my $upload_content = $upload->content;
+        my $meta_data = {
+            uuid => $uuid,
+            digest => {
+                sha512_base64 => sha512_base64( $upload_content ),
+                whirlpool_base64 => whirlpool_base64( $upload_content ),
+            },
+            basename_ext => ((lc($upload->basename) =~ m{\.([^\.]+)\z})[0] // ""),
             upload => {
                 type     => $upload->type,
                 basename => $upload->basename,
@@ -120,12 +135,20 @@ post '/' => sub {
                 path => $path,
             },
             uploaded_at => Time::Moment->now->strftime("%Y-%m-%dT%H:%M:%S%f%Z"),
-        });
+        };
 
-        $upload->link_to($path);
+        debug "The filename is $path";
+
+        write_file_json( PUBTMP_ROOT . "/meta/$uuid.json", $meta_data);
+
+        $upload->copy_to($path);
     }
 
     redirect "/";
 };
+
+for(PUBTMP_ROOT, PUBTMP_ROOT."/meta", PUBTMP_ROOT."/store") {
+    mkdir($_) unless -d $_;
+}
 
 true;
