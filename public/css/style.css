@@ -107,3 +107,18 @@ p {
 .file-preview-image img {
     width: 100%;
 }
+
+ul.toolbar li {
+    display: block;
+    float: left;
+    margin: 5px;
+    border: 1px solid black;
+    height: 30px;
+}
+ul.toolbar li a {
+    display: block;
+    line-height: 30px;
+    vertical-align: middle;
+    text-decoration: none;
+    padding: 0 5px;
+}

@@ -1,6 +1,6 @@
 <div id="content">
   <div id="header">
-    <h1>Pubtmp</h1>
+    <h1><a href="<% request.uri_base %>">Pubtmp</a></h1>
     <h2>The folder for everone.</h2>
   </div>
 
