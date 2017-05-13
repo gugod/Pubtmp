@@ -43,7 +43,7 @@
       <ul>
         <% FOREACH pubtmp_file_list%>
         <li>
-          <tt><a href="<% link_to_download %>"><% basename %></a></tt>
+          <tt><a href="<% link_to_download %>"><% basename %></a> (<% size_human %>)</tt>
           <time datetime="<% uploaded_at %>"><% uploaded_at %></time>
         </li>       
         <% END %>

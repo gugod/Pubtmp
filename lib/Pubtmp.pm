@@ -36,6 +36,13 @@ sub write_file_json {
     close($fh);
 }
 
+sub humanized_file_size {
+    my ($n) = @_;
+    return 1+int($n/1024) .    "KB" if ($n < 1048576);
+    return 1+int($n/1048576) . "MB" if ($n < 1073741824);
+    return sprintf("%.1fGB", $n/1073741824);
+}
+
 sub gather_files_in_pubtmp {
     my @files;
     my $meta_files = File::Next::files(PUBTMP_ROOT . "/meta");
@@ -47,7 +54,10 @@ sub gather_files_in_pubtmp {
             push @files, {
                 basename => $meta_data->{upload}{basename},
                 uploaded_at => $meta_data->{uploaded_at},
-                # storage => $meta_data->{storage},
+
+                size       => $meta_data->{upload}{size},
+                size_human => humanized_file_size($meta_data->{upload}{size}),
+
                 link_to_download => "/dl/" . $meta_data->{name},
             };
         } else {
@@ -103,6 +113,7 @@ post '/' => sub {
                 type     => $upload->type,
                 basename => $upload->basename,
                 headers  => $upload->headers,
+                size     => (stat($upload->file_handle))[7],
             },
             storage => {
                 type => "filesystem",
