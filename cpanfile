@@ -1,5 +1,10 @@
 requires "Dancer2" => "0.205000";
 
+requires "Time::Moment" => 0;
+requires "Digest"       => 0;
+requires "Digest::SHA"  => 0;
+requires "File::Next"   => 0;
+
 recommends "YAML"             => "0";
 recommends "URL::Encode::XS"  => "0";
 recommends "CGI::Deurl::XS"   => "0";

@@ -33,13 +33,22 @@
     </div>
 
     <div id="file-upload">
-      <form id="header-file-upload" name="header-file-upload" method="POST" action="/tmp">
-        <input type="file" name="file">
+      <form id="header-file-upload" name="header-file-upload" method="POST" action="/" enctype="multipart/form-data">
+        <input type="file" name="f">
         <input type="submit" value="Upload">
       </form>
     </div>
 
     <div id="file-list">
+      <ul>
+        <% FOREACH pubtmp_file_list%>
+        <li>
+          <tt><a href="<% link_to_download %>"><% basename %></a></tt>
+          <time datetime="<% uploaded_at %>"><% uploaded_at %></time>
+        </li>       
+        <% END %>
+      </ul>
     </div>
+
   </div>
 </div>
