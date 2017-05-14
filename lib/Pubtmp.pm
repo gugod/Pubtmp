@@ -172,6 +172,9 @@ post '/' => sub {
         my $uuid = generate_uuid();
         my $path = PUBTMP_ROOT . "/store/$uuid";
 
+        my $basename = $upload->basename;
+        $basename =~ s/\p{Noncharacter_Code_Point}//g;
+
         my $upload_content = $upload->content;
         my $file_meta_data = {
             uuid => $uuid,
@@ -179,10 +182,10 @@ post '/' => sub {
                 sha512_base64 => sha512_base64( $upload_content ),
                 whirlpool_base64 => whirlpool_base64( $upload_content ),
             },
-            basename_ext => ((lc($upload->basename) =~ m{\.([^\.]+)\z})[0] // ""),
+            basename_ext => ((lc($basename) =~ m{\.([^\.]+)\z})[0] // ""),
             upload => {
                 type     => $upload->type,
-                basename => $upload->basename,
+                basename => $basename,
                 headers  => $upload->headers,
                 size     => (stat($upload->file_handle))[7],
             },
