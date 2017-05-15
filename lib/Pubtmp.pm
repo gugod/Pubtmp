@@ -167,46 +167,46 @@ post '/file/:uuid' => sub {
 
 post '/' => sub {
     my $upload = upload("f");
-    debug "The upload is $upload";
-    if ($upload) {
-        my $uuid = generate_uuid();
-        my $path = PUBTMP_ROOT . "/store/$uuid";
-
-        my $basename = $upload->basename;
-        $basename =~ s/\p{Noncharacter_Code_Point}//g;
-
-        my $upload_content = $upload->content;
-        my $file_meta_data = {
-            uuid => $uuid,
-            digest => {
-                sha512_base64 => sha512_base64( $upload_content ),
-                whirlpool_base64 => whirlpool_base64( $upload_content ),
-            },
-            basename_ext => ((lc($basename) =~ m{\.([^\.]+)\z})[0] // ""),
-            upload => {
-                type     => $upload->type,
-                basename => $basename,
-                headers  => $upload->headers,
-                size     => (stat($upload->file_handle))[7],
-            },
-            storage => {
-                type => "filesystem",
-                path => $path,
-            },
-            meta => {
-                path => PUBTMP_ROOT . "/meta/$uuid.json",
-            },
-            uploaded_at => Time::Moment->now->strftime("%Y-%m-%dT%H:%M:%S%f%Z"),
-        };
-
-        debug "The filename is $path";
-
-        write_file_json($file_meta_data->{meta}{path} , $file_meta_data);
-
-        $upload->copy_to($path);
+    unless ($upload) {
+        redirect "/"
+        return;
     }
 
-    redirect "/";
+    my $uuid = generate_uuid();
+    my $path = PUBTMP_ROOT . "/store/$uuid";
+
+    my $basename = $upload->basename;
+    $basename =~ s/\p{Noncharacter_Code_Point}//g;
+
+    my $upload_content = $upload->content;
+    my $file_meta_data = {
+        uuid => $uuid,
+        digest => {
+            sha512_base64 => sha512_base64( $upload_content ),
+            whirlpool_base64 => whirlpool_base64( $upload_content ),
+        },
+        basename_ext => ((lc($basename) =~ m{\.([^\.]+)\z})[0] // ""),
+        upload => {
+            type     => $upload->type,
+            basename => $basename,
+            headers  => $upload->headers,
+            size     => (stat($upload->file_handle))[7],
+        },
+        storage => {
+            type => "filesystem",
+            path => $path,
+        },
+        meta => {
+            path => PUBTMP_ROOT . "/meta/$uuid.json",
+        },
+        uploaded_at => Time::Moment->now->strftime("%Y-%m-%dT%H:%M:%S%f%Z"),
+    };
+
+    debug "The filename is $path";
+
+    write_file_json($file_meta_data->{meta}{path} , $file_meta_data);
+
+    $upload->copy_to($path);
 };
 
 for(PUBTMP_ROOT, PUBTMP_ROOT."/meta", PUBTMP_ROOT."/store") {
