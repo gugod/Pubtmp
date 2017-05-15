@@ -8,37 +8,26 @@
   </head>
   <body>
     <div id="page">
-      <div id="sidebar">
-        <ul id="sidebar-items">
-          <li>
-            <h3>What's this</h3>
-
-            <p>
-              Pubtmp is a pbulic temporary directory for anyone to
-              place their miscellnous items.  All users have equal
-              rights to save some files here, as well as delete them.
-            </p>
-
-            <p>
-              That's right. It's all public.
-            </p>
-          </li>
-
-          <li>
-            <h3>Join the Project</h3>
-            <ul class="links">
-
-              <li><a href="https://github.com/gugod/Pubtmp/">Source code</a></li>
-              <li><a href="http://perldancer.org/">PerlDancer</a> -- the Web framework that made this site possible</li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
       <% content %>
     </div>
     <div id="footer">
-      Powered by <a href="http://perldancer.org/">Dancer2</a> <% dancer_version %>
+      <h3>What's this</h3>
+
+      <p>
+        Pubtmp is a pbulic temporary directory for anyone to
+        place their miscellnous items.  All users have equal
+        rights to save some files here, as well as delete them.
+      </p>
+
+      <p>
+        That's right. It's all public.
+      </p>
+
+      <h3>Join the Project</h3>
+      <ul class="links">
+        <li><a href="https://github.com/gugod/Pubtmp/">Source code</a></li>
+        <li>Powered by <a href="http://perldancer.org/">Dancer 2</a> <% dancer_version %></li>
+      </ul>
     </div>
   </body>
 </html>

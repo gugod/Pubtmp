@@ -33,29 +33,21 @@ a:hover {
     border-top: none;
     padding: 25px;
     width: auto;
-    margin-right: 200px;
-}
-
-#sidebar {
-    float: right;
-    width: 175px;
 }
 
 #header {
-    padding-left: 75px;
-    padding-right: 30px;
+    padding-left: 60px;
+    padding-right: 5px;
 }
-
 
 #header {
     background-image: url("/images/folder.svg");
     background-repeat: no-repeat;
     background-position: top left;
-    height: 64px;
+    background-size: 48px 48px;
 }
 #header h1, #header h2 {margin: 0}
 #header h2 {
-    color: #888;
     font-weight: normal;
     font-size: 16px;
 }
@@ -89,17 +81,17 @@ p {
 
 #footer {
     clear: both;
-    padding-top: 2em;
-    text-align: center;
-    padding-right: 160px;
     font-family: sans-serif;
     font-size: 10px;
+    margin: 1em;
 }
 
-#file-list table {
-    width: 100%;
+#file-list ul {
+    padding: 0;
 }
-
+#file-list li {
+    margin: 0 0 1em 0;
+}
 
 .file-preview-image img {
     width: auto;
@@ -108,9 +100,10 @@ p {
     width: 100%;
 }
 
+ul.toolbar {
+    border-top: 2px solid #ccc;
+}
 ul.toolbar li {
-    display: block;
-    float: left;
     margin: 5px;
     border: 1px solid black;
     height: 30px;

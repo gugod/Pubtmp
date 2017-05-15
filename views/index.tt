@@ -1,46 +1,31 @@
 <div id="content">
   <div id="header">
-    <h1><a href="<% request.uri_base %>">Pubtmp</a></h1>
-    <h2>The folder for everone.</h2>
+    <h1><a href="<% request.uri_base %>">/pub/tmp/</a></h1>
+  </div>
+
+  <div id="file-list">
+    <ul>
+      <% FOREACH pubtmp_file_list %>
+      <li>
+        <span><a href="<% url_for_preview %>"><% basename %></a></span>
+        <span><% size_human %></span>
+      </li>
+      <% END %>
+    </ul>
+    <hr>
   </div>
 
   <div id="file-upload">
+    <h3>Upload</h3>
     <form id="header-file-upload" name="header-file-upload" method="POST" action="/" enctype="multipart/form-data">
       <input type="file" name="f">
       <input type="submit" value="Upload">
     </form>
-  </div>
-
-  <div id="file-list">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Size</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% FOREACH pubtmp_file_list %>
-        <tr>
-          <td class="file-list-filename">
-            <a href="<% url_for_preview %>"><% basename %></a>
-          </td>
-          <td>
-            <% size_human %>
-          </td>
-          <td>
-            <time datetime="<% uploaded_at %>"><% uploaded_at %></time>
-          </td>
-        </tr>
-        <% END %>
-      </tbody>
-    </table>
-    <hr>
+    <h3>Usage</h3>
     <p>
       Disk space used: <% pubtmp_folder_size_used_human %><br>
       Disk space free: <% pubtmp_folder_size_free_human %><br>
     </p>
   </div>
-
+  
 </div>

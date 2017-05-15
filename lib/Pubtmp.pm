@@ -125,7 +125,7 @@ get '/' => sub {
     my $folder_size_used = sum(map{ $_->{size} }@$files) // 0;
     my $folder_size_free = PUBTMP_QUOTA - $folder_size_used;
     template 'index' => {
-        'title' => 'Pubtmp',
+        'title' => '/pub/tmp/',
         pubtmp_folder_size_free_human => humanized_file_size($folder_size_free),
         pubtmp_folder_size_used_human => humanized_file_size($folder_size_used),
         pubtmp_folder_quota_human     => humanized_file_size(PUBTMP_QUOTA),
@@ -140,6 +140,7 @@ get '/preview/:basename' => sub {
     };
 
     template 'preview' => {
+        'title' => '/pub/tmp/ ' . param("basename"),
         file => humanize_file( $file_meta_data )
     };
 };
@@ -168,7 +169,7 @@ post '/file/:uuid' => sub {
 post '/' => sub {
     my $upload = upload("f");
     unless ($upload) {
-        redirect "/"
+        redirect "/";
         return;
     }
 
@@ -207,6 +208,8 @@ post '/' => sub {
     write_file_json($file_meta_data->{meta}{path} , $file_meta_data);
 
     $upload->copy_to($path);
+
+    redirect "/";
 };
 
 for(PUBTMP_ROOT, PUBTMP_ROOT."/meta", PUBTMP_ROOT."/store") {
