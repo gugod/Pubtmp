@@ -67,11 +67,11 @@ sub humanize_file {
 
         ($file_meta_data->{upload}{type} =~ /\Aimage/) ? (
             is_previewable_as_image => 1,
-            url_for_previewable_image => uri_for("/file/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { n => $file_meta_data->{uuid} })
+            url_for_previewable_image => uri_for("/file/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { })
         ):(),
 
-        url_for_preview  => uri_for("/preview/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { n => $file_meta_data->{uuid} }),
-        url_for_download  => uri_for("/file/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { n => $file_meta_data->{uuid}, dl => 1 }),
+        url_for_preview  => uri_for("/preview/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename})),
+        url_for_download  => uri_for("/file/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { dl => 1 }),
     };
 }
 
@@ -133,7 +133,7 @@ get '/' => sub {
     };
 };
 
-get '/preview/:basename' => sub {
+get '/preview/:n/:basename' => sub {
     my $file_meta_data = file_lookup_by_uuid( param("n") ) or do {
         redirect "/";
         return;
@@ -145,7 +145,7 @@ get '/preview/:basename' => sub {
     };
 };
 
-get '/file/:basename' => sub {
+get '/file/:n/:basename' => sub {
     my $file_meta_data = file_lookup_by_uuid( param("n") ) or do {
         redirect "/";
         return;
