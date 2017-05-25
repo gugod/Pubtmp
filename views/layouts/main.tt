@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title><% title %></title>
     <link rel="stylesheet" href="<% request.uri_base %>/css/style.css">
+    <% if file.is_previewable_as_image %>
+    <meta property="og:image" content="<% file.url_for_previewable_image %>"/>
+    <% end %>
   </head>
   <body>
     <div id="page">
