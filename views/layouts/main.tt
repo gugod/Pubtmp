@@ -14,12 +14,17 @@
       <% content %>
     </div>
     <div id="footer">
-      <h3>What's this</h3>
+      <h3>What's "Pubtmp"</h3>
 
       <p>
         Pubtmp is a pbulic temporary directory for anyone to
         place their miscellnous items.  All users have equal
         rights to save some files here, as well as delete them.
+      </p>
+
+      <p>
+        It may be used as a free image hosting service, just keep in
+        mind that this is not a permanent storage.
       </p>
 
       <p>
