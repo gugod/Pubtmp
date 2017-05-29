@@ -2,6 +2,7 @@ package Pubtmp;
 use autodie;
 
 use Dancer2;
+use Imager;
 use Digest;
 use Digest::Whirlpool;
 use Digest::SHA qw(sha512_base64);
@@ -11,7 +12,7 @@ use Time::Moment;
 use File::Next;
 use URI::Escape qw(uri_escape uri_escape_utf8);
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use constant PUBTMP_QUOTA => "2147483648"; # 2GB
 use constant PUBTMP_ROOT => "/tmp/pubtmp";
@@ -67,7 +68,8 @@ sub humanize_file {
 
         ($file_meta_data->{upload}{type} =~ /\Aimage/) ? (
             is_previewable_as_image => 1,
-            url_for_previewable_image => uri_for("/file/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { })
+            url_for_previewable_image_thumbnail => uri_for("/image_thumbnail/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { }),
+            url_for_previewable_image => uri_for("/file/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { }),
         ):(),
 
         url_for_preview  => uri_for("/preview/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename})),
@@ -145,6 +147,26 @@ get '/preview/:n/:basename' => sub {
     };
 };
 
+get '/image_thumbnail/:n/:basename' => sub {
+    my $id = param("n");
+    my $file_meta_data = file_lookup_by_uuid( $id ) or do {
+        redirect "/";
+        return;
+    };
+
+    my $thumb_path = PUBTMP_ROOT . "/thumb/${id}.jpg";
+    unless (-f $thumb_path) {
+        my $img = Imager->new( file => $file_meta_data->{storage}{path} );
+        my $thumb = $img->scale(
+            qtype => "preview",
+            xpixels => 128,
+        );
+        $thumb->write( file => $thumb_path  );
+    }
+
+    send_file($thumb_path, system_path => 1);
+};
+
 get '/file/:n/:basename' => sub {
     my $file_meta_data = file_lookup_by_uuid( param("n") ) or do {
         redirect "/";
@@ -212,7 +234,7 @@ post '/' => sub {
     redirect "/";
 };
 
-for(PUBTMP_ROOT, PUBTMP_ROOT."/meta", PUBTMP_ROOT."/store") {
+for(PUBTMP_ROOT, PUBTMP_ROOT."/meta", PUBTMP_ROOT."/store", PUBTMP_ROOT."/thumb") {
     mkdir($_) unless -d $_;
 }
 

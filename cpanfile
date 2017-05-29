@@ -1,5 +1,6 @@
 requires "Dancer2" => "0.205000";
 
+requires "Imager"       => 0;
 requires "Time::Moment" => 0;
 requires "Digest"       => 0;
 requires "Digest::SHA"  => 0;

@@ -7,7 +7,12 @@
     <ul>
       <% FOREACH pubtmp_file_list %>
       <li>
-        <span><a href="<% url_for_preview %>"><% basename %></a></span>
+        <span>
+        <% IF is_previewable_as_image %>
+            <img src="<% url_for_previewable_image_thumbnail %>">
+        <% END %>
+            <a href="<% url_for_preview %>"><% basename %></a>
+        </span>
         <span><% size_human %></span>
       </li>
       <% END %>
