@@ -156,12 +156,12 @@ get '/image_thumbnail/:n/:basename' => sub {
 
     my $thumb_path = PUBTMP_ROOT . "/thumb/${id}.jpg";
     unless (-f $thumb_path) {
-        my $img = Imager->new( file => $file_meta_data->{storage}{path} );
+        my $img = Imager->new( file => $file_meta_data->{storage}{path} ) or die Imager->errstr;
         my $thumb = $img->scale(
             qtype => "preview",
             xpixels => 128,
         );
-        $thumb->write( file => $thumb_path  );
+        $thumb->write( file => $thumb_path  ) or die Imager->errstr;
     }
 
     send_file($thumb_path, system_path => 1);
