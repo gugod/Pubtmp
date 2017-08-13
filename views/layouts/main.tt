@@ -14,28 +14,65 @@
       <% content %>
     </div>
     <div id="footer">
-      <h3>What's "Pubtmp"</h3>
+      <article>
+        <section>
+          <h3>What's "Pubtmp"</h3>
 
-      <p>
-        Pubtmp is a pbulic temporary directory for anyone to
-        place their miscellnous items.  All users have equal
-        rights to save some files here, as well as delete them.
-      </p>
+          <p>
+            Pubtmp is a pbulic temporary directory for anyone to
+            place their miscellnous items.  All users have equal
+            rights to save some files here, as well as delete them.
+          </p>
 
-      <p>
-        It may be used as a free image hosting service, just keep in
-        mind that this is not a permanent storage.
-      </p>
+          <p>
+            It may be used as a free image hosting service, just keep in
+            mind that this is not a permanent storage.
+          </p>
 
-      <p>
-        That's right. It's all public.
-      </p>
+          <p>
+            That's right. It's all public.
+          </p>
+        </section>
 
-      <h3>Join the Project</h3>
-      <ul class="links">
-        <li><a href="https://github.com/gugod/Pubtmp/">Source code</a></li>
-        <li>Powered by <a href="http://perldancer.org/">Dancer 2</a> <% dancer_version %></li>
-      </ul>
+        <section>
+          <h3>Terms of use of this service</h3>
+
+          <p>
+            This service is provided without any level of quality
+            guarantee. All files stored by this services is only
+            temporarily available.
+          </p>
+
+
+          <p>
+            The downloadable content servied by this service are
+            provided by the users and not verified by the service
+            provider. The service provide is not responsible for any
+            outcome caused by downloading and/or using the content.
+          </p>
+
+          <p>
+            There is no storage guarantee for any uploaded
+            material. They might be removed at any time, by anyone,
+            without prior notice.
+          </p>
+
+          <p>
+            If you are not sure whether image you want to upload is
+            allowed then do not upload that image.
+          </p>
+        </section>
+
+        <section>
+          <h3>Join the Project</h3>
+          <ul class="links">
+            <li><a href="https://github.com/gugod/Pubtmp/">Source code</a></li>
+            <li>Powered by <a href="http://perldancer.org/">Dancer 2</a> <% dancer_version %></li>
+          </ul>
+        </section>
+      </article>
+
     </div>
+
   </body>
 </html>

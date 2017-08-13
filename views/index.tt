@@ -32,5 +32,4 @@
       Disk space free: <% pubtmp_folder_size_free_human %><br>
     </p>
   </div>
-  
 </div>
