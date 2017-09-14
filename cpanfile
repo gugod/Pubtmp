@@ -1,4 +1,4 @@
-requires "Dancer2" => "0.203000";
+requires "Dancer2" => "0.205000";
 
 requires "Imager"       => 0;
 requires "Time::Moment" => 0;

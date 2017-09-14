@@ -11,7 +11,6 @@ use List::Util qw(sum);
 use Time::Moment;
 use File::Next;
 use URI::Escape qw(uri_escape uri_escape_utf8);
-use JSON qw(encode_json decode_json);
 
 our $VERSION = '0.2';
 
