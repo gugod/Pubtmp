@@ -11,6 +11,7 @@ use List::Util qw(sum);
 use Time::Moment;
 use File::Next;
 use URI::Escape qw(uri_escape uri_escape_utf8);
+use JSON qw(encode_json decode_json);
 
 our $VERSION = '0.2';
 
@@ -70,7 +71,9 @@ sub humanize_file {
             is_previewable_as_image => 1,
             url_for_previewable_image_thumbnail => uri_for("/image_thumbnail/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { }),
             url_for_previewable_image => uri_for("/file/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { }),
-        ):(),
+        ):(
+            is_previewable_as_image => 0,
+        ),
 
         url_for_preview  => uri_for("/preview/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename})),
         url_for_download  => uri_for("/file/$file_meta_data->{uuid}/" . uri_escape_utf8($file_meta_data->{upload}{basename}), { dl => 1 }),
